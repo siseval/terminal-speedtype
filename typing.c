@@ -21,25 +21,24 @@ void run()
     main_loop(words);
 }
 
+void time_menu()
+{
+}
 
 void main_loop(char* words[])
 {
     char* lines[LINE_COUNT];
-    for (int i = 0; i < LINE_COUNT; i++)
-    {
-        lines[i] = gen_random_line(words);
-    }
     char* typed[LINE_COUNT - 1]; 
-    for (int i = 0; i < LINE_COUNT - 1; i++)
-    {
-        typed[i] = malloc(sizeof(char[get_line_length(0)]));
-        empty_string(typed[i]);
-    }
+    allocate_strings(lines, typed, words);
 
     bool is_rotated = false;
+    time_t t0 = time(NULL);
 
     while (true)
     {
+        time_t seconds = time(NULL) - t0;
+        print_top(seconds);
+
         char input = handle_input(typed[is_rotated]);
         if (should_rotate(lines, typed[is_rotated], input, is_rotated))
         {
@@ -60,6 +59,20 @@ void main_loop(char* words[])
         }
         print_lines(lines, typed, is_rotated);
     }
+}
+
+void allocate_strings(char* lines[], char* typed[], char* words[])
+{
+    for (int i = 0; i < LINE_COUNT; i++)
+    {
+        lines[i] = gen_random_line(words);
+    }
+     for (int i = 0; i < LINE_COUNT - 1; i++)
+    {
+        typed[i] = malloc(sizeof(char[get_line_length(0)]));
+        empty_string(typed[i]);
+    }
+
 }
 
 void empty_string(char* string)
@@ -105,10 +118,34 @@ void rotate_lines(char* lines[], char* words[], bool has_rotated)
     }
 }
 
+void move_center_v(int dy)
+{
+    move((int)(get_scrh() / 2) + dy, 0);
+}
+
+void print_top(time_t seconds)
+{
+    attron(A_BOLD);
+    move_center_v(-6);
+    to_center(num_length(seconds), get_scrw());
+    printw("%ld", seconds);
+    attroff(A_BOLD);
+}
+int num_length(int value) 
+{
+    int l = 1;
+    while (value > 9) 
+    {
+        l++;
+        value /= 10;
+    }
+    return l;
+}
+
 void prepare_print()
 {
     clear();
-    move((int)(get_scrh() / 2) - 3, 0);
+    move_center_v(-3);
     attron(COLOR_PAIR(1));
 }
 void print_lines(char* lines[], char* typed[], int cur_line)
