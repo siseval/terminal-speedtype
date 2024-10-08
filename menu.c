@@ -25,7 +25,7 @@ void draw_buttons(struct menu m, int scrw, int gaps[])
 
 struct button get_button(struct menu m, int i) { return m.buttons[i]; }
 
-void handle_input(struct menu *m) 
+void menu_input(struct menu *m) 
 {
 
     switch (getch()) 

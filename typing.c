@@ -24,29 +24,117 @@ void run()
 void run_loop(char* words[])
 {
     char* lines[LINE_COUNT];
-    lines[0] = gen_random_line(words);
-    lines[1] = gen_random_line(words);
+    for (int i = 0; i < LINE_COUNT; i++)
+    {
+        lines[i] = gen_random_line(words);
+    }
+    char* typed = malloc(sizeof(char[get_line_length(0)]));
+
+    bool has_rotated = false;
 
     while (true)
     {
-        getch();
-        print_lines(lines, LINE_COUNT);
+        char input = handle_input(typed);
+        if (should_rotate(lines, typed, input, has_rotated))
+        {
+            rotate_lines(lines, words, has_rotated);
+            has_rotated = true;
+            empty_string(typed);
+        }
+        if (has_rotated && input == K_BACKSPACE && strlen(typed) == 0)
+        {
+            has_rotated = false;
+        }
+        print_lines(lines, typed, has_rotated);
     }
 }
 
-void print_lines(char* lines[], int line_count)
+void empty_string(char* string)
+{
+    for (int i = 0; i < get_line_length(0); i++)
+    {
+        string[i] = '\0';
+    }
+}
+
+char handle_input(char* typed)
+{
+    char input = getch();
+    switch (input)
+    {
+        case ERR:
+            break;
+        case K_BACKSPACE:
+            typed[strlen(typed) - 1] = '\0';
+            break;
+        default:
+            typed[strlen(typed)] = input;
+            break;
+    }
+    return input;
+}
+
+bool should_rotate(char* lines[], char* typed, char input, bool has_rotated)
+{
+    return input == K_ENTER && strlen(typed) >= strlen(lines[has_rotated]);
+}
+void rotate_lines(char* lines[], char* words[], bool has_rotated)
+{
+    if (has_rotated)
+    {
+        lines[0] = lines[1];
+        lines[1] = lines[2];
+        lines[2] = gen_random_line(words);
+    }
+}
+
+void prepare_print()
 {
     clear();
+    move((int)(get_scrh() / 2) - 3, 0);
     attron(COLOR_PAIR(1));
-    for (int l = 0; l < line_count; l++)
+}
+void print_lines(char* lines[], char* typed, int cur_line)
+{
+    prepare_print();
+    for (int i = 0; i < LINE_COUNT; i++)
     {
-        to_center(strlen(lines[l]), get_scrw());
-        for (int c = 0; c < strlen(lines[l]); c++)
-        {
-            printw("%c", lines[l][c]);
-        }
-        printw("\n\n\r");
+        print_line(lines[i], i == cur_line ? typed : NULL);
     }
+}
+void print_line(char* line, char* typed)
+{
+    to_center(strlen(line), get_scrw());
+    for (int c = 0; c < strlen(line); c++)
+    {
+        handle_color(line, typed, c);
+        line[c] == '%' ? printw("  ") : printw("%c", line[c]);
+    }
+    printw("\n\n\r");
+}
+
+void handle_color(char* line, char* typed, int c)
+{
+    if (typed == NULL) 
+    {
+        attroff(A_BOLD);
+        attron(COLOR_PAIR(1));
+        return;
+    }
+    if (typed[c] == 0)
+    {
+        attroff(A_BOLD);
+        attron(COLOR_PAIR(1));
+        return;
+    }
+    if (line[c] == typed[c])
+    {
+        attron(A_BOLD);
+        attron(COLOR_PAIR(1));
+        return;
+    }
+    attron(A_BOLD);
+    attron(COLOR_PAIR(2));
 }
 
 char* get_random_word(char* words[])
@@ -76,7 +164,12 @@ int get_scrw()
     getmaxyx(stdscr, scrh, scrw);
     return scrw;
 }
-
+int get_scrh()
+{
+    int scrw, scrh;
+    getmaxyx(stdscr, scrh, scrw);
+    return scrh;
+}
 
 void init_curses()
 {
@@ -89,6 +182,9 @@ void init_curses()
     start_color();
     use_default_colors();
     init_pair(1, COLOR_WHITE, -1);
+    init_pair(2, COLOR_RED, -1);
+    init_pair(3, COLOR_YELLOW, -1);
+    init_pair(4, COLOR_GREEN, -1);
 }
 void end_curses()
 {
