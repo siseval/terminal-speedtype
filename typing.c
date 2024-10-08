@@ -28,24 +28,29 @@ void run_loop(char* words[])
     {
         lines[i] = gen_random_line(words);
     }
-    char* typed = malloc(sizeof(char[get_line_length(0)]));
+    char* typed[LINE_COUNT - 1]; 
+    for (int i = 0; i < LINE_COUNT - 1; i++)
+    {
+        typed[i] = malloc(sizeof(char[get_line_length(0)]));
+    }
 
-    bool has_rotated = false;
+    bool is_rotated = false;
 
     while (true)
     {
-        char input = handle_input(typed);
-        if (should_rotate(lines, typed, input, has_rotated))
+        char input = handle_input(typed[is_rotated]);
+        if (should_rotate(lines, typed[is_rotated], input, is_rotated))
         {
-            rotate_lines(lines, words, has_rotated);
-            has_rotated = true;
-            empty_string(typed);
+            rotate_lines(lines, words, is_rotated);
+            is_rotated = true;
+            strcpy(typed[0], typed[1]);
+            empty_string(typed[is_rotated]);
         }
-        if (has_rotated && input == K_BACKSPACE && strlen(typed) == 0)
+        if (is_rotated && input == K_BACKSPACE && typed[is_rotated][0] == '\0')
         {
-            has_rotated = false;
+            is_rotated = false;
         }
-        print_lines(lines, typed, has_rotated);
+        print_lines(lines, typed, is_rotated);
     }
 }
 
@@ -76,7 +81,7 @@ char handle_input(char* typed)
 
 bool should_rotate(char* lines[], char* typed, char input, bool has_rotated)
 {
-    return input == K_ENTER && strlen(typed) >= strlen(lines[has_rotated]);
+    return strlen(typed) >= strlen(lines[has_rotated]) - 1;
 }
 void rotate_lines(char* lines[], char* words[], bool has_rotated)
 {
@@ -94,12 +99,12 @@ void prepare_print()
     move((int)(get_scrh() / 2) - 3, 0);
     attron(COLOR_PAIR(1));
 }
-void print_lines(char* lines[], char* typed, int cur_line)
+void print_lines(char* lines[], char* typed[], int cur_line)
 {
     prepare_print();
     for (int i = 0; i < LINE_COUNT; i++)
     {
-        print_line(lines[i], i == cur_line ? typed : NULL);
+        print_line(lines[i], i <= cur_line ? typed[i] : NULL);
     }
 }
 void print_line(char* line, char* typed)

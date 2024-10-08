@@ -28,11 +28,11 @@ void run_loop(char* words[]);
 void empty_string(char* string);
 char handle_input(char* typed);
 
-bool should_rotate(char* lines[], char* typed, char input, bool has_rotated);
-void rotate_lines(char* lines[], char* words[], bool has_rotated);
+bool should_rotate(char* lines[], char* typed, char input, bool is_rotated);
+void rotate_lines(char* lines[], char* words[], bool is_rotated);
 
 void prepare_print();
-void print_lines(char* lines[], char* typed, int cur_line);
+void print_lines(char* lines[], char* typed[], int cur_line);
 void print_line(char* line, char* typed);
 void handle_color(char* line, char* typed, int c);
 
