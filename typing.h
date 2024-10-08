@@ -16,6 +16,8 @@
 #define K_ENTER 10
 #define K_BACKSPACE 127
 
+#define EMPTY '\e'
+
 #define REFRESH_MS 1000
 
 int main(int argc, char* argv[]);
@@ -23,7 +25,7 @@ void init_curses();
 void end_curses();
 
 void run();
-void run_loop(char* words[]);
+void main_loop(char* words[]);
 
 void empty_string(char* string);
 char handle_input(char* typed);

@@ -18,10 +18,11 @@ void run()
     char* words[WORD_COUNT];
     read_file(words, "../words.csv");
 
-    run_loop(words);
+    main_loop(words);
 }
 
-void run_loop(char* words[])
+
+void main_loop(char* words[])
 {
     char* lines[LINE_COUNT];
     for (int i = 0; i < LINE_COUNT; i++)
@@ -32,6 +33,7 @@ void run_loop(char* words[])
     for (int i = 0; i < LINE_COUNT - 1; i++)
     {
         typed[i] = malloc(sizeof(char[get_line_length(0)]));
+        empty_string(typed[i]);
     }
 
     bool is_rotated = false;
@@ -42,13 +44,19 @@ void run_loop(char* words[])
         if (should_rotate(lines, typed[is_rotated], input, is_rotated))
         {
             rotate_lines(lines, words, is_rotated);
+            if (is_rotated)
+            {
+                strcpy(typed[0], typed[1]);
+            }
             is_rotated = true;
-            strcpy(typed[0], typed[1]);
+
             empty_string(typed[is_rotated]);
         }
-        if (is_rotated && input == K_BACKSPACE && typed[is_rotated][0] == '\0')
+        if (is_rotated && input == EMPTY && typed[1][0] == '\0')
         {
             is_rotated = false;
+            typed[0][strlen(typed[0]) - 1] = '\0';
+            empty_string(typed[1]);
         }
         print_lines(lines, typed, is_rotated);
     }
@@ -70,6 +78,10 @@ char handle_input(char* typed)
         case ERR:
             break;
         case K_BACKSPACE:
+            if (strlen(typed) < 1)
+            {
+                input = EMPTY;
+            }
             typed[strlen(typed) - 1] = '\0';
             break;
         default:
@@ -81,15 +93,15 @@ char handle_input(char* typed)
 
 bool should_rotate(char* lines[], char* typed, char input, bool has_rotated)
 {
-    return strlen(typed) >= strlen(lines[has_rotated]) - 1;
+    return input != ERR && strlen(typed) >= strlen(lines[has_rotated]);
 }
 void rotate_lines(char* lines[], char* words[], bool has_rotated)
 {
     if (has_rotated)
     {
-        lines[0] = lines[1];
-        lines[1] = lines[2];
-        lines[2] = gen_random_line(words);
+        strcpy(lines[0], lines[1]);
+        strcpy(lines[1], lines[2]);
+        strcpy(lines[2], gen_random_line(words));
     }
 }
 
@@ -113,7 +125,12 @@ void print_line(char* line, char* typed)
     for (int c = 0; c < strlen(line); c++)
     {
         handle_color(line, typed, c);
-        line[c] == '%' ? printw("  ") : printw("%c", line[c]);
+        bool do_underscore = false;
+        if (typed != NULL && line[c] == ' ')
+        {
+            do_underscore = (typed[c] != ' ' && typed[c] != '\0') || strlen(typed) == c;
+        }
+        do_underscore ? printw("_") : printw("%c", line[c]);
     }
     printw("\n\n\r");
 }
@@ -126,7 +143,13 @@ void handle_color(char* line, char* typed, int c)
         attron(COLOR_PAIR(1));
         return;
     }
-    if (typed[c] == 0)
+    if (strlen(typed) == c)
+    {
+        attron(A_BOLD);
+        attron(COLOR_PAIR(3));
+        return;
+    }
+    if (typed[c] == '\0')
     {
         attroff(A_BOLD);
         attron(COLOR_PAIR(1));
