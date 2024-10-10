@@ -1,4 +1,5 @@
 #include "typing.h"
+#include "menu.h"
 #include <curses.h>
 
 int main(int argc, char* argv[])
@@ -33,7 +34,7 @@ void main_menu(char* words[])
     struct menu time_menu = {"=: Time limit :=", ":: ", " ::", 3, 1, true, false, 4, 0, b_fifteen_sec, b_thirty_sec, b_sixty_sec, b_quit};
     int gaps[] = {4, 2, 2, 4};
 
-    int selection = do_menu(&time_menu, gaps, true);
+    int selection = do_menu(&time_menu, gaps, 0, true);
 
     int times[] = {15, 30, 60};
 
@@ -48,15 +49,38 @@ void main_menu(char* words[])
 
 void end_menu(char* words[], int num_correct, int num_typed, int seconds)
 {
+    clear();
+
     struct button b_retry = {"Retry"};
     struct button b_to_menu = {"Main Menu"};
 
-    struct menu end_menu = {"=: Stats :=", ":: ", " ::", 3, 1, true, false, 2, 0, b_retry.text, b_to_menu};
-    int gaps[] = {4, 2};
+    struct menu end_menu = {"", ":: ", " ::", 3, 1, true, false, 2, 0, b_retry.text, b_to_menu};
+    int gaps[] = {2, 2};
 
-    do_menu(&end_menu, gaps, false); 
+    print_stats(num_correct, num_typed, seconds);
+
+    do_menu(&end_menu, gaps, 4, false); 
 
     end_menu.selected ? main_menu(words) : main_loop(words, seconds);
+}
+
+void print_stats(int num_correct, int num_typed, int seconds)
+{
+    int accuracy_percent = calc_accuracy(num_correct, num_typed);
+    char accuracy_str[20];
+    sprintf(accuracy_str, "Accuracy: %d%%", accuracy_percent);
+
+    float wpm = calc_wpm(num_correct, seconds);
+    char wpm_str[20];
+    sprintf(wpm_str, "WPM: %.0f", wpm);
+
+    struct button l_accuracy = {accuracy_str};
+    struct button l_wpm = {wpm_str};
+
+    struct menu stats = {"=: Stats :=", "- ", " -", 1, 1, true, false, 2, 0, l_accuracy, l_wpm}; 
+    int gaps[] = {4, 2};
+
+    print_as_labels(stats, gaps, -4, false);
 }
 
 void main_loop(char* words[], int time_limit_sec)
@@ -208,6 +232,16 @@ int num_correct(bool* is_correct, int* num_typed)
         num_correct += is_correct[i];
     }
     return num_correct;
+}
+
+int calc_accuracy(int num_correct, int num_typed)
+{
+    return num_correct * 100 / num_typed;
+}
+
+float calc_wpm(int num_correct, int seconds)
+{
+    return ((float)num_correct / ((float)seconds / 60)) / 4;
 }
 
 int num_length(int value) 

@@ -23,7 +23,7 @@ void draw_buttons(struct menu m, int gaps[])
     }
 }
 
-int do_menu(struct menu *m, int gaps[], bool clear_screen)
+int do_menu(struct menu *m, int gaps[], int dy, bool clear_screen)
 {
     m->bold ? attron(A_BOLD) : attroff(A_BOLD);
     int selection = m->selected;
@@ -33,7 +33,7 @@ int do_menu(struct menu *m, int gaps[], bool clear_screen)
         {
             clear();
         }
-        move_center_v(-((int)(get_height(*m, gaps) / 2)));
+        move_center_v(-((int)(get_height(*m, gaps) / 2)) + dy);
         move_center_h(-((int)(strlen(m->top_text) / 2)));
 
         printw("%s", m->top_text);
@@ -43,6 +43,18 @@ int do_menu(struct menu *m, int gaps[], bool clear_screen)
     }
     attroff(A_BOLD);
     return selection;
+}
+
+void print_as_labels(struct menu m, int gaps[], int dy, bool clear_screen)
+{
+    m.bold ? attron(A_BOLD) : attroff(A_BOLD);
+
+    move_center_v(-((int)(get_height(m, gaps) / 2)) + dy);
+    move_center_h(-((int)(strlen(m.top_text) / 2)));
+
+    printw("%s", m.top_text);
+    draw_buttons(m, gaps);
+
 }
 
 int get_height(struct menu m, int gaps[])

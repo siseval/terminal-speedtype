@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <curses.h>
+#include <string.h>
 #include <time.h>
 #include "menu.h"
 
@@ -31,6 +32,7 @@ void quit();
 
 void main_menu(char* words[]);
 void end_menu(char* words[], int num_correct, int num_typed, int seconds);
+void print_stats(int num_correct, int num_typed, int seconds);
 void main_loop(char* words[], int time_limit);
 
 void allocate_strings(char* lines[], char* typed[], char* words[]);
@@ -44,6 +46,9 @@ bool should_rotate(char* lines[], char* typed, char input, bool is_rotated);
 void rotate_lines(char* lines[], char* words[], bool is_rotated);
 
 int num_correct(bool* is_correct, int* num_typed);
+int calc_accuracy(int num_correct, int num_typed);
+float calc_wpm(int num_correct, int seconds);
+
 void print_top(time_t seconds);
 int num_length(int value);
 

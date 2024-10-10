@@ -28,7 +28,9 @@ struct button get_button(struct menu m, int i);
 
 void draw_button(struct button b, struct menu m, int col);
 void draw_buttons(struct menu m, int gaps[]);
-int do_menu(struct menu *m, int gaps[], bool clear_screen);
+int do_menu(struct menu *m, int gaps[], int dy, bool clear_screen);
+
+void print_as_labels(struct menu m, int gaps[], int dy, bool clear_screen);
 
 int get_height(struct menu m, int gaps[]);
 
