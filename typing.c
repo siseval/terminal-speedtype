@@ -31,7 +31,8 @@ void main_loop(char* words[])
     char* typed[LINE_COUNT - 1]; 
     allocate_strings(lines, typed, words);
 
-    char* correct = malloc(sizeof(char[MAX_TYPED]));
+    bool* is_correct = malloc(sizeof(bool[MAX_TYPED]));
+    int* num_typed;
 
     bool is_rotated = false;
     time_t t0 = time(NULL);
@@ -41,26 +42,15 @@ void main_loop(char* words[])
         time_t seconds = time(NULL) - t0;
         print_top(seconds);
 
-        char input = handle_input(typed[is_rotated]);
-        if (should_rotate(lines, typed[is_rotated], input, is_rotated))
-        {
-            rotate_lines(lines, words, is_rotated);
-            if (is_rotated)
-            {
-                strcpy(typed[0], typed[1]);
-            }
-            is_rotated = true;
-
-            empty_string(typed[is_rotated]);
-        }
-        if (is_rotated && input == EMPTY && typed[1][0] == '\0')
-        {
-            is_rotated = false;
-            typed[0][strlen(typed[0]) - 1] = '\0';
-            empty_string(typed[1]);
-        }
+        char input = handle_input(typed[is_rotated], lines[is_rotated], is_correct, num_typed);
+        is_rotated = handle_rotation(lines, typed, words, is_rotated, input);
+        
         print_lines(lines, typed, is_rotated);
     }
+
+    free_strings(lines, typed);
+    free(is_correct);
+    free(words);
 }
 
 void allocate_strings(char* lines[], char* typed[], char* words[])
@@ -74,7 +64,17 @@ void allocate_strings(char* lines[], char* typed[], char* words[])
         typed[i] = malloc(sizeof(char[get_line_length(0)]));
         empty_string(typed[i]);
     }
-
+}
+void free_strings(char* lines[], char* typed[])
+{
+    for (int i = 0; i < LINE_COUNT; i++)
+    {
+        free(lines[i]);
+    }
+    for (int i = 0; i < LINE_COUNT - 1; i++)
+    {
+        free(typed[i]);
+    }
 }
 
 void empty_string(char* string)
@@ -85,28 +85,51 @@ void empty_string(char* string)
     }
 }
 
-char handle_input(char* typed)
+char handle_input(char* typed, char* line, bool* is_correct, int* num_typed)
 {
+    int typed_count = *num_typed;
+
     char input = getch();
+    input = input == K_ENTER ? ' ' : input;
     switch (input)
     {
         case ERR:
             break;
         case K_BACKSPACE:
-            if (strlen(typed) < 1)
-            {
-                input = EMPTY;
-            }
+            if (strlen(typed) < 1) { input = EMPTY; }
+            typed_count -= 1;
             typed[strlen(typed) - 1] = '\0';
-            break;
-        case K_ENTER:
-            typed[strlen(typed)] = ' ';
             break;
         default:
             typed[strlen(typed)] = input;
+            is_correct[typed_count] = typed[strlen(typed) - 1] == line[strlen(typed) - 1];
+            typed_count += 1;
             break;
     }
+    num_typed = &typed_count;
     return input;
+}
+
+bool handle_rotation(char* lines[], char* typed[], char* words[], bool is_rotated, char input)
+{
+    if (should_rotate(lines, typed[is_rotated], input, is_rotated))
+        {
+            rotate_lines(lines, words, is_rotated);
+            if (is_rotated)
+            {
+                strcpy(typed[0], typed[1]);
+            }
+            is_rotated = true;
+
+            empty_string(typed[is_rotated]);
+        }
+    if (is_rotated && input == EMPTY && typed[1][0] == '\0')
+        {
+            is_rotated = false;
+            typed[0][strlen(typed[0]) - 1] = '\0';
+            empty_string(typed[1]);
+        }
+    return is_rotated;
 }
 
 bool should_rotate(char* lines[], char* typed, char input, bool has_rotated)

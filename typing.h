@@ -30,9 +30,11 @@ void run();
 void main_loop(char* words[]);
 
 void allocate_strings(char* lines[], char* typed[], char* words[]);
+void free_strings(char* lines[], char* typed[]);
 void empty_string(char* string);
-char handle_input(char* typed);
+char handle_input(char* typed, char* line, bool* is_correct, int* num_typed);
 
+bool handle_rotation(char* lines[], char* typed[], char* words[], bool is_rotated, char input);
 bool should_rotate(char* lines[], char* typed, char input, bool is_rotated);
 void rotate_lines(char* lines[], char* words[], bool is_rotated);
 
