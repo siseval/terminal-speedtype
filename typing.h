@@ -18,6 +18,7 @@
 
 #define K_ENTER 10
 #define K_BACKSPACE 127
+#define K_ESCAPE 27
 
 #define EMPTY '\e'
 

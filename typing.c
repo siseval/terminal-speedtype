@@ -103,6 +103,12 @@ void main_loop(char* words[], int time_limit_sec)
         print_top(seconds);
 
         char input = handle_input(typed[is_rotated], lines[is_rotated], is_correct, &num_typed);
+        if (input == K_ESCAPE) 
+        { 
+            main_menu(words);
+            return;
+        }
+
         is_rotated = handle_rotation(lines, typed, words, is_rotated, input);
         
         print_lines(lines, typed, is_rotated);
@@ -163,6 +169,8 @@ char handle_input(char* typed, char* line, bool* is_correct, int* num_typed)
     {
         case ERR:
             break;
+        case K_ESCAPE:
+            return input; 
         case K_BACKSPACE:
             if (strlen(typed) < 1) { input = EMPTY; }
             is_correct[*num_typed] = false;
