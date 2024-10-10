@@ -38,6 +38,7 @@ bool handle_rotation(char* lines[], char* typed[], char* words[], bool is_rotate
 bool should_rotate(char* lines[], char* typed, char input, bool is_rotated);
 void rotate_lines(char* lines[], char* words[], bool is_rotated);
 
+int num_correct(bool* is_correct, int* num_typed);
 void print_top(time_t seconds);
 int num_length(int value);
 

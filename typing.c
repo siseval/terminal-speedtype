@@ -32,7 +32,7 @@ void main_loop(char* words[])
     allocate_strings(lines, typed, words);
 
     bool* is_correct = malloc(sizeof(bool[MAX_TYPED]));
-    int* num_typed;
+    int num_typed = 0;
 
     bool is_rotated = false;
     time_t t0 = time(NULL);
@@ -42,7 +42,7 @@ void main_loop(char* words[])
         time_t seconds = time(NULL) - t0;
         print_top(seconds);
 
-        char input = handle_input(typed[is_rotated], lines[is_rotated], is_correct, num_typed);
+        char input = handle_input(typed[is_rotated], lines[is_rotated], is_correct, &num_typed);
         is_rotated = handle_rotation(lines, typed, words, is_rotated, input);
         
         print_lines(lines, typed, is_rotated);
@@ -65,6 +65,7 @@ void allocate_strings(char* lines[], char* typed[], char* words[])
         empty_string(typed[i]);
     }
 }
+
 void free_strings(char* lines[], char* typed[])
 {
     for (int i = 0; i < LINE_COUNT; i++)
@@ -87,8 +88,6 @@ void empty_string(char* string)
 
 char handle_input(char* typed, char* line, bool* is_correct, int* num_typed)
 {
-    int typed_count = *num_typed;
-
     char input = getch();
     input = input == K_ENTER ? ' ' : input;
     switch (input)
@@ -97,16 +96,17 @@ char handle_input(char* typed, char* line, bool* is_correct, int* num_typed)
             break;
         case K_BACKSPACE:
             if (strlen(typed) < 1) { input = EMPTY; }
-            typed_count -= 1;
+            is_correct[*num_typed] = false;
+            *num_typed -= 1;
             typed[strlen(typed) - 1] = '\0';
             break;
         default:
             typed[strlen(typed)] = input;
-            is_correct[typed_count] = typed[strlen(typed) - 1] == line[strlen(typed) - 1];
-            typed_count += 1;
+            is_correct[*num_typed] = typed[strlen(typed) - 1] == line[strlen(typed) - 1];
+            *num_typed += 1;
             break;
     }
-    num_typed = &typed_count;
+    printw("%d", num_typed);
     return input;
 }
 
@@ -158,6 +158,16 @@ void print_top(time_t seconds)
     to_center(num_length(seconds), get_scrw());
     printw("%ld", seconds);
     attroff(A_BOLD);
+}
+
+int num_correct(bool* is_correct, int* num_typed)
+{
+    int num_correct = 0;
+    for (int i = 0; i < *num_typed; i++)
+    {
+        num_correct += is_correct[i];
+    }
+    return num_correct;
 }
 
 int num_length(int value) 
