@@ -10,7 +10,7 @@
 #define WORD_SIZE 128
 #define WORD_COUNT 3000
 
-#define MAX_TYPED 500
+#define MAX_TYPED 5000
 
 #define LINE_PADDING 10
 #define LINE_COUNT 3
@@ -28,10 +28,12 @@ void end_curses();
 
 void run();
 void main_menu(char* words[]);
+void end_menu(char* words[], int num_correct, int num_typed, int seconds);
 void main_loop(char* words[], int time_limit);
 
 void allocate_strings(char* lines[], char* typed[], char* words[]);
 void free_strings(char* lines[], char* typed[]);
+void free_words(char* words[]);
 void empty_string(char* string);
 char handle_input(char* typed, char* line, bool* is_correct, int* num_typed);
 
@@ -53,9 +55,6 @@ char* get_random_word(char* words[]);
 char* gen_random_line(char* words[]);
 
 int get_line_length(int padding);
-void move_center_v(int dy);
-int get_scrw();
-int get_scrh();
 
 void read_file(char* dest[], char* filename);
 

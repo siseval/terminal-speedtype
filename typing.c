@@ -23,15 +23,12 @@ void run()
 
 void main_menu(char* words[])
 {
-    char* top_text = "=: Time limit :=";
-
-    struct button fifteen_sec = {"15sec"};
-    struct button thirty_sec = {"30sec"};
-    struct button sixty_sec = {"60sec"};
+    struct button fifteen_sec = {"15 sec"};
+    struct button thirty_sec = {"30 sec"};
+    struct button sixty_sec = {"60 sec"};
     struct button quit = {"Quit"};
 
-    struct menu time_menu = {":: ", " ::", 3, 1, true, false, 4, 1, fifteen_sec.text, thirty_sec.text, sixty_sec.text, quit.text};
-
+    struct menu time_menu = {"=: Time limit :=", ":: ", " ::", 3, 1, true, false, 4, 1, fifteen_sec, thirty_sec, sixty_sec, quit};
     int gaps[] = {4, 2, 2, 4};
 
     while (!time_menu.has_selected)
@@ -39,8 +36,6 @@ void main_menu(char* words[])
         clear();
         attron(A_BOLD);
         move_center_v(-10);
-        to_center(strlen(top_text), get_scrw());
-        printw("%s", top_text);
         draw_buttons(time_menu, get_scrw(), gaps);
         menu_input(&time_menu);
     }
@@ -49,13 +44,35 @@ void main_menu(char* words[])
 
     if (time_menu.selected == 3)
     {
+        free_words(words);
         exit(0);
     }
 
     main_loop(words, times[time_menu.selected]);
 }
 
-void main_loop(char* words[], int time_limit)
+void end_menu(char* words[], int num_correct, int num_typed, int seconds)
+{
+    struct button retry = {"Retry"};
+    struct button to_menu = {"Main Menu"};
+
+    struct menu end_menu = {"=: Stats :=", ":: ", " ::", 3, 1, true, false, 2, 0, retry.text, to_menu};
+
+    int gaps[] = {4, 2};
+
+    while (!end_menu.has_selected)
+    {
+        clear();
+        attron(A_BOLD);
+        move_center_v(-10);
+        draw_buttons(end_menu, get_scrw(), gaps);
+        menu_input(&end_menu);
+    }
+
+
+}
+
+void main_loop(char* words[], int time_limit_sec)
 {
     char* lines[LINE_COUNT];
     char* typed[LINE_COUNT - 1]; 
@@ -69,7 +86,7 @@ void main_loop(char* words[], int time_limit)
 
     print_lines(lines, typed, is_rotated);
 
-    while (time(NULL) - t0 < time_limit)
+    while (time(NULL) - t0 < time_limit_sec)
     {
         time_t seconds = time(NULL) - t0;
         print_top(seconds);
@@ -106,6 +123,14 @@ void free_strings(char* lines[], char* typed[])
     for (int i = 0; i < LINE_COUNT - 1; i++)
     {
         free(typed[i]);
+    }
+}
+
+void free_words(char* words[])
+{
+    for (int i = 0; i < WORD_COUNT; i++)
+    {
+        free(words[i]);
     }
 }
 
@@ -177,16 +202,11 @@ void rotate_lines(char* lines[], char* words[], bool has_rotated)
     }
 }
 
-void move_center_v(int dy)
-{
-    move((int)(get_scrh() / 2) + dy, 0);
-}
-
 void print_top(time_t seconds)
 {
     attron(A_BOLD);
     move_center_v(-6);
-    to_center(num_length(seconds), get_scrw());
+    move_center_h(num_length(seconds)); 
     printw("%ld", seconds);
     attroff(A_BOLD);
 }
@@ -230,7 +250,7 @@ void print_lines(char* lines[], char* typed[], int cur_line)
 
 void print_line(char* line, char* typed)
 {
-    to_center(strlen(line), get_scrw());
+    move_center_h(strlen(line));
     for (int c = 0; c < strlen(line); c++)
     {
         handle_color(line, typed, c);
@@ -294,20 +314,6 @@ char* gen_random_line(char* words[])
 int get_line_length(int padding)
 {
     return get_scrw() - padding * 2;
-}
-
-int get_scrw()
-{
-    int scrw, scrh;
-    getmaxyx(stdscr, scrh, scrw);
-    return scrw;
-}
-
-int get_scrh()
-{
-    int scrw, scrh;
-    getmaxyx(stdscr, scrh, scrw);
-    return scrh;
 }
 
 void init_curses()

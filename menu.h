@@ -12,6 +12,7 @@ struct button
 
 struct menu 
 {
+    char* top_text;
     char *left;
     char *right;
     int selected_col;
@@ -27,9 +28,14 @@ struct button get_button(struct menu m, int i);
 
 void draw_button(struct button b, struct menu m, int col, int scrw);
 void draw_buttons(struct menu m, int scrw, int gaps[]);
+void do_menu(struct menu m, int scrw, int scrh, int gaps[]);
 
 void menu_input(struct menu *m);
 
-void to_center(int len, int scrw);
-
+int get_cur_x();
+int get_cur_y();
+int get_scrw();
+int get_scrh();
+void move_center_v(int dy);
+void move_center_h(int dx);
 #endif
