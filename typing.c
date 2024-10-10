@@ -18,14 +18,44 @@ void run()
     char* words[WORD_COUNT];
     read_file(words, "../words.csv");
 
-    main_loop(words);
+    main_menu(words);
 }
 
-void time_menu()
+void main_menu(char* words[])
 {
+    char* top_text = "=: Time limit :=";
+
+    struct button fifteen_sec = {"15sec"};
+    struct button thirty_sec = {"30sec"};
+    struct button sixty_sec = {"60sec"};
+    struct button quit = {"Quit"};
+
+    struct menu time_menu = {":: ", " ::", 3, 1, true, false, 4, 1, fifteen_sec.text, thirty_sec.text, sixty_sec.text, quit.text};
+
+    int gaps[] = {4, 2, 2, 4};
+
+    while (!time_menu.has_selected)
+    {
+        clear();
+        attron(A_BOLD);
+        move_center_v(-10);
+        to_center(strlen(top_text), get_scrw());
+        printw("%s", top_text);
+        draw_buttons(time_menu, get_scrw(), gaps);
+        menu_input(&time_menu);
+    }
+
+    int times[] = {15, 30, 60};
+
+    if (time_menu.selected == 3)
+    {
+        exit(0);
+    }
+
+    main_loop(words, times[time_menu.selected]);
 }
 
-void main_loop(char* words[])
+void main_loop(char* words[], int time_limit)
 {
     char* lines[LINE_COUNT];
     char* typed[LINE_COUNT - 1]; 
@@ -37,7 +67,9 @@ void main_loop(char* words[])
     bool is_rotated = false;
     time_t t0 = time(NULL);
 
-    while (true)
+    print_lines(lines, typed, is_rotated);
+
+    while (time(NULL) - t0 < time_limit)
     {
         time_t seconds = time(NULL) - t0;
         print_top(seconds);
@@ -50,7 +82,6 @@ void main_loop(char* words[])
 
     free_strings(lines, typed);
     free(is_correct);
-    free(words);
 }
 
 void allocate_strings(char* lines[], char* typed[], char* words[])

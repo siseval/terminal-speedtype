@@ -27,7 +27,8 @@ void init_curses();
 void end_curses();
 
 void run();
-void main_loop(char* words[]);
+void main_menu(char* words[]);
+void main_loop(char* words[], int time_limit);
 
 void allocate_strings(char* lines[], char* typed[], char* words[]);
 void free_strings(char* lines[], char* typed[]);
@@ -52,6 +53,7 @@ char* get_random_word(char* words[]);
 char* gen_random_line(char* words[]);
 
 int get_line_length(int padding);
+void move_center_v(int dy);
 int get_scrw();
 int get_scrh();
 

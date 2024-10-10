@@ -5,21 +5,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct button {
-
-  char *text;
+struct button 
+{
+    char *text;
 };
 
-struct menu {
-
-  char *left;
-  char *right;
-  bool has_selected;
-  int selected_col;
-  int normal_col;
-  int num_buttons;
-  int selected;
-  struct button buttons[20];
+struct menu 
+{
+    char *left;
+    char *right;
+    int selected_col;
+    int normal_col;
+    bool bold;     
+    bool has_selected;
+    int num_buttons;
+    int selected;
+    struct button buttons[20];
 };
 
 struct button get_button(struct menu m, int i);

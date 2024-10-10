@@ -4,7 +4,7 @@ void draw_button(struct button b, struct menu m, int col, int scrw)
 {
     attron(COLOR_PAIR(col));
   
-    to_center(strlen(b.text), scrw);
+    to_center(strlen(b.text) + strlen(m.left) + strlen(m.right), scrw);
     printw("%s%s%s\n\r", m.left, b.text, m.right);
 
     attroff(COLOR_PAIR(col));
@@ -12,6 +12,8 @@ void draw_button(struct button b, struct menu m, int col, int scrw)
 
 void draw_buttons(struct menu m, int scrw, int gaps[]) 
 {
+    m.bold ? attron(A_BOLD) : attroff(A_BOLD);
+
     for (int i = 0; i < m.num_buttons; i++) 
     {
         struct button b = m.buttons[i];
@@ -21,6 +23,8 @@ void draw_buttons(struct menu m, int scrw, int gaps[])
         }
         draw_button(b, m, m.selected == i ? m.selected_col : m.normal_col, scrw);
     }
+
+    attroff(A_BOLD);
 }
 
 struct button get_button(struct menu m, int i) { return m.buttons[i]; }
@@ -49,7 +53,6 @@ void menu_input(struct menu *m)
 
 void to_center(int len, int scrw) 
 {
-
     int fwidth = (scrw / 2) - len / 2;
     char empty[100] = "";
     for (int i = 0; i < fwidth; i++) 
