@@ -10,6 +10,8 @@
 #define WORD_SIZE 128
 #define WORD_COUNT 3000
 
+#define MAX_TYPED 500
+
 #define LINE_PADDING 10
 #define LINE_COUNT 3
 

@@ -31,6 +31,8 @@ void main_loop(char* words[])
     char* typed[LINE_COUNT - 1]; 
     allocate_strings(lines, typed, words);
 
+    char* correct = malloc(sizeof(char[MAX_TYPED]));
+
     bool is_rotated = false;
     time_t t0 = time(NULL);
 
@@ -67,7 +69,7 @@ void allocate_strings(char* lines[], char* typed[], char* words[])
     {
         lines[i] = gen_random_line(words);
     }
-     for (int i = 0; i < LINE_COUNT - 1; i++)
+    for (int i = 0; i < LINE_COUNT - 1; i++)
     {
         typed[i] = malloc(sizeof(char[get_line_length(0)]));
         empty_string(typed[i]);
@@ -96,6 +98,9 @@ char handle_input(char* typed)
                 input = EMPTY;
             }
             typed[strlen(typed) - 1] = '\0';
+            break;
+        case K_ENTER:
+            typed[strlen(typed)] = ' ';
             break;
         default:
             typed[strlen(typed)] = input;
@@ -131,6 +136,7 @@ void print_top(time_t seconds)
     printw("%ld", seconds);
     attroff(A_BOLD);
 }
+
 int num_length(int value) 
 {
     int l = 1;
@@ -148,6 +154,7 @@ void prepare_print()
     move_center_v(-3);
     attron(COLOR_PAIR(1));
 }
+
 void print_lines(char* lines[], char* typed[], int cur_line)
 {
     prepare_print();
@@ -156,6 +163,7 @@ void print_lines(char* lines[], char* typed[], int cur_line)
         print_line(lines[i], i <= cur_line ? typed[i] : NULL);
     }
 }
+
 void print_line(char* line, char* typed)
 {
     to_center(strlen(line), get_scrw());
@@ -223,12 +231,14 @@ int get_line_length(int padding)
 {
     return get_scrw() - padding * 2;
 }
+
 int get_scrw()
 {
     int scrw, scrh;
     getmaxyx(stdscr, scrh, scrw);
     return scrw;
 }
+
 int get_scrh()
 {
     int scrw, scrh;
@@ -251,6 +261,7 @@ void init_curses()
     init_pair(3, COLOR_YELLOW, -1);
     init_pair(4, COLOR_GREEN, -1);
 }
+
 void end_curses()
 {
     endwin();
