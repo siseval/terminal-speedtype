@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <curses.h>
+#include <unistd.h>
 #include <string.h>
 #include <time.h>
 #include "menu.h"

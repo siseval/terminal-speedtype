@@ -55,9 +55,12 @@ void end_menu(char* words[], int num_correct, int num_typed, int seconds)
     struct button b_to_menu = {"Main Menu"};
 
     struct menu end_menu = {"", ":: ", " ::", 3, 1, true, false, 2, 0, b_retry.text, b_to_menu};
-    int gaps[] = {2, 2};
+    int gaps[] = {3, 2};
 
     print_stats(num_correct, num_typed, seconds);
+
+    usleep(1000000);
+    flushinp();
 
     do_menu(&end_menu, gaps, 4, false); 
 
@@ -81,6 +84,7 @@ void print_stats(int num_correct, int num_typed, int seconds)
     int gaps[] = {4, 2};
 
     print_as_labels(stats, gaps, -4, false);
+    refresh();
 }
 
 void main_loop(char* words[], int time_limit_sec)
@@ -93,16 +97,21 @@ void main_loop(char* words[], int time_limit_sec)
     int num_typed = 0;
 
     bool is_rotated = false;
-    time_t t0 = time(NULL);
 
+    timeout(-1);
     print_lines(lines, typed, is_rotated);
+    print_top(0);
+    char input = handle_input(typed[is_rotated], lines[is_rotated], is_correct, &num_typed);
+    time_t t0 = time(NULL);
+    print_lines(lines, typed, is_rotated);
+    timeout(REFRESH_MS);
 
     while (time(NULL) - t0 < time_limit_sec)
     {
         time_t seconds = time(NULL) - t0;
         print_top(seconds);
 
-        char input = handle_input(typed[is_rotated], lines[is_rotated], is_correct, &num_typed);
+        input = handle_input(typed[is_rotated], lines[is_rotated], is_correct, &num_typed);
         if (input == K_ESCAPE) 
         { 
             main_menu(words);
@@ -183,7 +192,6 @@ char handle_input(char* typed, char* line, bool* is_correct, int* num_typed)
             *num_typed += 1;
             break;
     }
-    printw("%d", num_typed);
     return input;
 }
 
@@ -358,7 +366,7 @@ void init_curses()
     cbreak();
     noecho();
     curs_set(0);
-    timeout(REFRESH_MS);
+    timeout(-1);
 
     start_color();
     use_default_colors();
