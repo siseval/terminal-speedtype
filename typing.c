@@ -7,9 +7,6 @@ int main(int argc, char* argv[])
     srand(time(NULL));
 
     run();
-
-    end_curses();
-
     return 0;
 }
 
@@ -20,32 +17,30 @@ void run()
 
     main_menu(words);
 }
+void quit()
+{
+    end_curses();
+    exit(0);
+}
 
 void main_menu(char* words[])
 {
-    struct button fifteen_sec = {"15 sec"};
-    struct button thirty_sec = {"30 sec"};
-    struct button sixty_sec = {"60 sec"};
-    struct button quit = {"Quit"};
+    struct button b_fifteen_sec = {"15 sec"};
+    struct button b_thirty_sec = {"30 sec"};
+    struct button b_sixty_sec = {"60 sec"};
+    struct button b_quit = {"Quit"};
 
-    struct menu time_menu = {"=: Time limit :=", ":: ", " ::", 3, 1, true, false, 4, 1, fifteen_sec, thirty_sec, sixty_sec, quit};
+    struct menu time_menu = {"=: Time limit :=", ":: ", " ::", 3, 1, true, false, 4, 0, b_fifteen_sec, b_thirty_sec, b_sixty_sec, b_quit};
     int gaps[] = {4, 2, 2, 4};
 
-    while (!time_menu.has_selected)
-    {
-        clear();
-        attron(A_BOLD);
-        move_center_v(-10);
-        draw_buttons(time_menu, get_scrw(), gaps);
-        menu_input(&time_menu);
-    }
+    int selection = do_menu(&time_menu, gaps, true);
 
     int times[] = {15, 30, 60};
 
-    if (time_menu.selected == 3)
+    if (selection == 3)
     {
         free_words(words);
-        exit(0);
+        quit();
     }
 
     main_loop(words, times[time_menu.selected]);
@@ -53,23 +48,15 @@ void main_menu(char* words[])
 
 void end_menu(char* words[], int num_correct, int num_typed, int seconds)
 {
-    struct button retry = {"Retry"};
-    struct button to_menu = {"Main Menu"};
+    struct button b_retry = {"Retry"};
+    struct button b_to_menu = {"Main Menu"};
 
-    struct menu end_menu = {"=: Stats :=", ":: ", " ::", 3, 1, true, false, 2, 0, retry.text, to_menu};
-
+    struct menu end_menu = {"=: Stats :=", ":: ", " ::", 3, 1, true, false, 2, 0, b_retry.text, b_to_menu};
     int gaps[] = {4, 2};
 
-    while (!end_menu.has_selected)
-    {
-        clear();
-        attron(A_BOLD);
-        move_center_v(-10);
-        draw_buttons(end_menu, get_scrw(), gaps);
-        menu_input(&end_menu);
-    }
+    do_menu(&end_menu, gaps, false); 
 
-
+    end_menu.selected ? main_menu(words) : main_loop(words, seconds);
 }
 
 void main_loop(char* words[], int time_limit_sec)
@@ -99,6 +86,8 @@ void main_loop(char* words[], int time_limit_sec)
 
     free_strings(lines, typed);
     free(is_correct);
+
+    end_menu(words, num_correct(is_correct, &num_typed), num_typed, time_limit_sec);
 }
 
 void allocate_strings(char* lines[], char* typed[], char* words[])
@@ -206,7 +195,7 @@ void print_top(time_t seconds)
 {
     attron(A_BOLD);
     move_center_v(-6);
-    move_center_h(num_length(seconds)); 
+    center_string(num_length(seconds)); 
     printw("%ld", seconds);
     attroff(A_BOLD);
 }
@@ -250,7 +239,7 @@ void print_lines(char* lines[], char* typed[], int cur_line)
 
 void print_line(char* line, char* typed)
 {
-    move_center_h(strlen(line));
+    center_string(strlen(line));
     for (int c = 0; c < strlen(line); c++)
     {
         handle_color(line, typed, c);
@@ -309,6 +298,11 @@ char* gen_random_line(char* words[])
         strcat(line, " ");
     }
     return line;
+}
+
+void center_string(int length)
+{
+    move_center_h(-((int)(length / 2)));
 }
 
 int get_line_length(int padding)

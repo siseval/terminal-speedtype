@@ -27,6 +27,8 @@ void init_curses();
 void end_curses();
 
 void run();
+void quit();
+
 void main_menu(char* words[]);
 void end_menu(char* words[], int num_correct, int num_typed, int seconds);
 void main_loop(char* words[], int time_limit);
@@ -54,6 +56,7 @@ void handle_color(char* line, char* typed, int c);
 char* get_random_word(char* words[]);
 char* gen_random_line(char* words[]);
 
+void center_string(int length);
 int get_line_length(int padding);
 
 void read_file(char* dest[], char* filename);

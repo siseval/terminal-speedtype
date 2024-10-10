@@ -26,11 +26,13 @@ struct menu
 
 struct button get_button(struct menu m, int i);
 
-void draw_button(struct button b, struct menu m, int col, int scrw);
-void draw_buttons(struct menu m, int scrw, int gaps[]);
-void do_menu(struct menu m, int scrw, int scrh, int gaps[]);
+void draw_button(struct button b, struct menu m, int col);
+void draw_buttons(struct menu m, int gaps[]);
+int do_menu(struct menu *m, int gaps[], bool clear_screen);
 
-void menu_input(struct menu *m);
+int get_height(struct menu m, int gaps[]);
+
+int menu_input(struct menu *m);
 
 int get_cur_x();
 int get_cur_y();
