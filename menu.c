@@ -54,7 +54,6 @@ void print_as_labels(struct menu m, int gaps[], int dy, bool clear_screen)
 
     printw("%s", m.top_text);
     draw_buttons(m, gaps);
-
 }
 
 int get_height(struct menu m, int gaps[])
@@ -67,7 +66,10 @@ int get_height(struct menu m, int gaps[])
     return height;
 }
 
-struct button get_button(struct menu m, int i) { return m.buttons[i]; }
+struct button get_button(struct menu m, int i) 
+{
+    return m.buttons[i]; 
+}
 
 int menu_input(struct menu *m) 
 {
@@ -98,6 +100,7 @@ int get_cur_x()
     getyx(stdscr, y, x);
     return x;
 }
+
 int get_cur_y()
 {
     int y, x;

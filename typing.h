@@ -14,16 +14,14 @@
 
 #define MAX_TYPED 5000
 
-#define LINE_PADDING 15
 #define LINE_COUNT 3
 
-#define K_ENTER 10
 #define K_BACKSPACE 127
 #define K_ESCAPE 27
 
 #define AVG_WORD_LENGTH 5
 
-#define EMPTY '\e'
+#define EMPTY -1
 
 #define REFRESH_MS 1000
 

@@ -8,7 +8,6 @@ int main(int argc, char* argv[])
     srand(time(NULL));
 
     run();
-    return 0;
 }
 
 void run()
@@ -54,9 +53,10 @@ void end_menu(char* words[], int num_correct, int num_typed, int seconds)
 
     struct button b_retry = {"Retry"};
     struct button b_to_menu = {"Main Menu"};
+    struct button b_quit = {"Quit"};
 
-    struct menu end_menu = {"", ":: ", " ::", 3, 1, true, false, 2, 0, b_retry.text, b_to_menu};
-    int gaps[] = {3, 2};
+    struct menu end_menu = {"", ":: ", " ::", 3, 1, true, false, 3, 0, b_retry.text, b_to_menu, b_quit};
+    int gaps[] = {3, 2, 2};
 
     print_stats(num_correct, num_typed, seconds);
 
@@ -64,6 +64,12 @@ void end_menu(char* words[], int num_correct, int num_typed, int seconds)
     flushinp();
 
     do_menu(&end_menu, gaps, 4, false); 
+
+    if (end_menu.selected == 2)
+    {
+        free_words(words);
+        quit();
+    }
 
     end_menu.selected ? main_menu(words) : main_loop(words, seconds);
 }
@@ -84,7 +90,7 @@ void print_stats(int num_correct, int num_typed, int seconds)
     struct menu stats = {"=: Stats :=", "- ", " -", 1, 1, true, false, 2, 0, l_accuracy, l_wpm}; 
     int gaps[] = {4, 2};
 
-    print_as_labels(stats, gaps, -4, false);
+    print_as_labels(stats, gaps, -5, false);
     refresh();
 }
 
@@ -110,6 +116,8 @@ void main_loop(char* words[], int time_limit_sec)
         input = handle_input(typed[is_rotated], lines[is_rotated], is_correct, &num_typed);
         if (input == K_ESCAPE) 
         { 
+            free_strings(lines, typed);
+            free(is_correct);
             main_menu(words);
             return;
         }
@@ -130,6 +138,7 @@ void first_iteration(char* words[], char* lines[], char* typed[], char* input, b
     print_lines(lines, typed, false);
     print_top(0);
     *input = handle_input(typed[false], lines[false], is_correct, num_typed);
+
     if (*input == K_ESCAPE) 
     { 
         free_strings(lines, typed);
@@ -137,6 +146,7 @@ void first_iteration(char* words[], char* lines[], char* typed[], char* input, b
         main_menu(words);
         return;
     }
+
     *t0 = time(NULL);
     print_lines(lines, typed, false);
     timeout(REFRESH_MS);
@@ -194,6 +204,7 @@ char handle_input(char* typed, char* line, bool* is_correct, int* num_typed)
 
         case K_ESCAPE:
             return input; 
+            break;
 
         case K_BACKSPACE:
             if (strlen(typed) < 1) { input = EMPTY; }
@@ -356,11 +367,13 @@ char* get_random_word(char* words[])
 
 char* gen_random_line(char* words[])
 {
-    int line_length = get_line_length(LINE_PADDING);
+    int line_length = get_line_length((int)(get_scrw() / 4));
     char* line = malloc(sizeof(char[line_length]));
-    while (strlen(line) < line_length)
+    while (true)
     {
-        strcat(line, get_random_word(words));
+        char* word = get_random_word(words);
+        if (strlen(line) + strlen(word) > line_length) { break; }
+        strcat(line, word);
         strcat(line, " ");
     }
     return line;
