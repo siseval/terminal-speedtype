@@ -42,4 +42,5 @@ int get_scrw();
 int get_scrh();
 void move_center_v(int dy);
 void move_center_h(int dx);
+
 #endif

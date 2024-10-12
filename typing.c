@@ -18,6 +18,7 @@ void run()
 
     main_menu(words);
 }
+
 void quit()
 {
     end_curses();
@@ -114,7 +115,6 @@ void main_loop(char* words[], int time_limit_sec)
         }
 
         is_rotated = handle_rotation(lines, typed, words, is_rotated, input);
-        
         print_lines(lines, typed, is_rotated);
     }
 
@@ -191,14 +191,17 @@ char handle_input(char* typed, char* line, bool* is_correct, int* num_typed)
     {
         case ERR:
             break;
+
         case K_ESCAPE:
             return input; 
+
         case K_BACKSPACE:
             if (strlen(typed) < 1) { input = EMPTY; }
             is_correct[*num_typed] = false;
             *num_typed -= 1;
             typed[strlen(typed) - 1] = '\0';
             break;
+
         default:
             typed[strlen(typed)] = input;
             is_correct[*num_typed] = typed[strlen(typed) - 1] == line[strlen(typed) - 1];
@@ -211,22 +214,22 @@ char handle_input(char* typed, char* line, bool* is_correct, int* num_typed)
 bool handle_rotation(char* lines[], char* typed[], char* words[], bool is_rotated, char input)
 {
     if (should_rotate(lines, typed[is_rotated], input, is_rotated))
+    {
+        rotate_lines(lines, words, is_rotated);
+        if (is_rotated)
         {
-            rotate_lines(lines, words, is_rotated);
-            if (is_rotated)
-            {
-                strcpy(typed[0], typed[1]);
-            }
-            is_rotated = true;
+            strcpy(typed[0], typed[1]);
+        }
+        is_rotated = true;
 
-            empty_string(typed[is_rotated]);
-        }
+        empty_string(typed[is_rotated]);
+    }
     if (is_rotated && input == EMPTY && typed[1][0] == '\0')
-        {
-            is_rotated = false;
-            typed[0][strlen(typed[0]) - 1] = '\0';
-            empty_string(typed[1]);
-        }
+    {
+        is_rotated = false;
+        typed[0][strlen(typed[0]) - 1] = '\0';
+        empty_string(typed[1]);
+    }
     return is_rotated;
 }
 
@@ -234,6 +237,7 @@ bool should_rotate(char* lines[], char* typed, char input, bool has_rotated)
 {
     return input != ERR && strlen(typed) >= strlen(lines[has_rotated]);
 }
+
 void rotate_lines(char* lines[], char* words[], bool has_rotated)
 {
     if (has_rotated)
@@ -246,8 +250,7 @@ void rotate_lines(char* lines[], char* words[], bool has_rotated)
 
 void print_top(time_t seconds)
 {
-    attron(A_BOLD);
-    move_center_v(-6);
+    attron(A_BOLD); move_center_v(-6);
     center_string(num_length(seconds)); 
     printw("%ld", seconds);
     attroff(A_BOLD);

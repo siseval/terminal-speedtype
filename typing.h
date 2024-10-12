@@ -14,7 +14,7 @@
 
 #define MAX_TYPED 5000
 
-#define LINE_PADDING 10
+#define LINE_PADDING 15
 #define LINE_COUNT 3
 
 #define K_ENTER 10
