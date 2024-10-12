@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define K_ENTER 10
+
 struct button 
 {
     char *text;

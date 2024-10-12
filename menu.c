@@ -85,6 +85,7 @@ int menu_input(struct menu *m)
 
     case ' ':
     case 'f':
+    case K_ENTER:
         m->has_selected = true;
         break;
     }
