@@ -10,7 +10,7 @@
 #include "menu.h"
 
 #define WORD_SIZE 128
-#define WORD_COUNT 3000
+#define WORD_COUNT 300
 
 #define MAX_TYPED 5000
 
@@ -20,6 +20,8 @@
 #define K_ENTER 10
 #define K_BACKSPACE 127
 #define K_ESCAPE 27
+
+#define AVG_WORD_LENGTH 5
 
 #define EMPTY '\e'
 
@@ -36,6 +38,7 @@ void main_menu(char* words[]);
 void end_menu(char* words[], int num_correct, int num_typed, int seconds);
 void print_stats(int num_correct, int num_typed, int seconds);
 void main_loop(char* words[], int time_limit);
+void first_iteration(char* words[], char* lines[], char* typed[], char* input, bool* is_correct, int* num_typed, time_t* t0);
 
 void allocate_strings(char* lines[], char* typed[], char* words[]);
 void free_strings(char* lines[], char* typed[]);

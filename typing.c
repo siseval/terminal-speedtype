@@ -94,17 +94,12 @@ void main_loop(char* words[], int time_limit_sec)
     allocate_strings(lines, typed, words);
 
     bool* is_correct = malloc(sizeof(bool[MAX_TYPED]));
-    int num_typed = 0;
+    bool is_rotated;
+    int num_typed;
+    char input;
+    time_t t0;
 
-    bool is_rotated = false;
-
-    timeout(-1);
-    print_lines(lines, typed, is_rotated);
-    print_top(0);
-    char input = handle_input(typed[is_rotated], lines[is_rotated], is_correct, &num_typed);
-    time_t t0 = time(NULL);
-    print_lines(lines, typed, is_rotated);
-    timeout(REFRESH_MS);
+    first_iteration(words, lines, typed, &input, is_correct, &num_typed, &t0);
 
     while (time(NULL) - t0 < time_limit_sec)
     {
@@ -127,6 +122,24 @@ void main_loop(char* words[], int time_limit_sec)
     free(is_correct);
 
     end_menu(words, num_correct(is_correct, &num_typed), num_typed, time_limit_sec);
+}
+
+void first_iteration(char* words[], char* lines[], char* typed[], char* input, bool* is_correct, int* num_typed, time_t* t0)
+{
+    timeout(-1);
+    print_lines(lines, typed, false);
+    print_top(0);
+    *input = handle_input(typed[false], lines[false], is_correct, num_typed);
+    if (*input == K_ESCAPE) 
+    { 
+        free_strings(lines, typed);
+        free(is_correct);
+        main_menu(words);
+        return;
+    }
+    *t0 = time(NULL);
+    print_lines(lines, typed, false);
+    timeout(REFRESH_MS);
 }
 
 void allocate_strings(char* lines[], char* typed[], char* words[])
@@ -257,7 +270,7 @@ int calc_accuracy(int num_correct, int num_typed)
 
 float calc_wpm(int num_correct, int seconds)
 {
-    return ((float)num_correct / ((float)seconds / 60)) / 4;
+    return ((float)num_correct / ((float)seconds / 60)) / 5;
 }
 
 int num_length(int value) 
