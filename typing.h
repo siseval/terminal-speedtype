@@ -12,7 +12,7 @@
 #define WORD_SIZE 128
 #define WORD_COUNT 300
 
-#define MAX_TYPED 5000
+#define MAX_TYPED 8192
 
 #define LINE_COUNT 3
 
@@ -25,7 +25,6 @@
 
 #define REFRESH_MS 1000
 
-int main(int argc, char* argv[]);
 void init_curses();
 void end_curses();
 

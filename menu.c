@@ -1,6 +1,6 @@
 #include "menu.h"
 
-void draw_button(struct button b, struct menu m, int col) 
+void draw_button(const struct button b, const struct menu m, const int col)
 {
     attron(COLOR_PAIR(col));
   
@@ -10,11 +10,11 @@ void draw_button(struct button b, struct menu m, int col)
     attroff(COLOR_PAIR(col));
 }
 
-void draw_buttons(struct menu m, int gaps[]) 
+void draw_buttons(const struct menu m, const int gaps[])
 {
     for (int i = 0; i < m.num_buttons; i++) 
     {
-        struct button b = m.buttons[i];
+        const struct button b = m.buttons[i];
         for (int j = 0; j < gaps[i]; j++) 
         {
             printw("\n");
@@ -33,8 +33,8 @@ int do_menu(struct menu *m, int gaps[], int dy, bool clear_screen)
         {
             clear();
         }
-        move_center_v(-((int)(get_height(*m, gaps) / 2)) + dy);
-        move_center_h(-((int)(strlen(m->top_text) / 2)));
+        move_center_v(-(get_height(*m, gaps) / 2) + dy);
+        move_center_h(-(strlen(m->top_text) / 2));
 
         printw("%s", m->top_text);
         draw_buttons(*m, gaps);
@@ -49,8 +49,13 @@ void print_as_labels(struct menu m, int gaps[], int dy, bool clear_screen)
 {
     m.bold ? attron(A_BOLD) : attroff(A_BOLD);
 
-    move_center_v(-((int)(get_height(m, gaps) / 2)) + dy);
-    move_center_h(-((int)(strlen(m.top_text) / 2)));
+    if (clear_screen)
+    {
+        clear();
+    }
+
+    move_center_v(-(get_height(m, gaps) / 2) + dy);
+    move_center_h(-(strlen(m.top_text) / 2));
 
     printw("%s", m.top_text);
     draw_buttons(m, gaps);
@@ -122,12 +127,12 @@ int get_scrh()
     return scrh;
 }
 
-void move_center_v(int dy)
+void move_center_v(const int dy)
 {
-    move((int)(get_scrh() / 2) + dy, get_cur_x());
+    move(get_scrh() / 2 + dy, get_cur_x());
 }
 
-void move_center_h(int dx)
+void move_center_h(const int dx)
 {
-    move(get_cur_y(), (int)(get_scrw() / 2) + dx);
+    move(get_cur_y(), get_scrw() / 2 + dx);
 }

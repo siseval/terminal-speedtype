@@ -1,6 +1,5 @@
 #include "typing.h"
 #include "menu.h"
-#include <curses.h>
 
 int main(int argc, char* argv[])
 {
@@ -55,7 +54,7 @@ void end_menu(char* words[], int num_correct, int num_typed, int seconds)
     struct button b_to_menu = {"Main Menu"};
     struct button b_quit = {"Quit"};
 
-    struct menu end_menu = {"", ":: ", " ::", 3, 1, true, false, 3, 0, b_retry.text, b_to_menu, b_quit};
+    struct menu end_menu = {"", ":: ", " ::", 3, 1, true, false, 3, 0, b_retry, b_to_menu, b_quit};
     int gaps[] = {3, 2, 2};
 
     print_stats(num_correct, num_typed, seconds);
