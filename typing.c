@@ -48,7 +48,7 @@ void main_menu(char* words[])
 
 void end_menu(char* words[], int num_correct, int num_typed, int seconds)
 {
-    clear();
+    erase();
 
     struct button b_retry = {"Retry"};
     struct button b_to_menu = {"Main Menu"};
@@ -299,7 +299,7 @@ int num_length(int value)
 
 void prepare_print()
 {
-    clear();
+    erase();
     move_center_v(-3);
     attron(COLOR_PAIR(1));
 }

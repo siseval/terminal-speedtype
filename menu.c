@@ -31,7 +31,7 @@ int do_menu(struct menu *m, int gaps[], int dy, bool clear_screen)
     {
         if (clear_screen)
         {
-            clear();
+            erase();
         }
         move_center_v(-(get_height(*m, gaps) / 2) + dy);
         move_center_h(-(strlen(m->top_text) / 2));
@@ -51,7 +51,7 @@ void print_as_labels(struct menu m, int gaps[], int dy, bool clear_screen)
 
     if (clear_screen)
     {
-        clear();
+        erase();
     }
 
     move_center_v(-(get_height(m, gaps) / 2) + dy);
